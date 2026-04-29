@@ -94,17 +94,29 @@ def home():
     return {"message": "DecideByAI GEO Engine is Online"}
 
 @app.post("/analyze")
-async def run_analysis(request: GeoAnalysisRequest, background_tasks: BackgroundTasks):
-    # 사용자는 즉시 응답을 받고, 무거운 분석과 메일 발송은 뒤에서 따로 처리함 (Time-out 방지)
-    background_tasks.add_task(process_full_workflow, request)
-    return {
-        "status": "accepted", 
-        "message": f"'{request.keyword}' 분석을 시작했습니다. 결과는 {request.user_email}로 전송됩니다."
-    }
+async def run_analysis(request: GeoAnalysisRequest):
+    # 테스트를 위해 백그라운드가 아닌 '직접 실행'으로 바꿉니다.
+    # 이렇게 하면 에러가 발생했을 때 로그에 즉시 찍힙니다.
+    try:
+        process_full_workflow(request)
+        return {
+            "status": "success",
+            "message": f"'{request.keyword}' 분석 및 메일 전송이 완료되었습니다."
+        }
+    except Exception as e:
+        # 에러가 나면 화면과 로그에 에러 내용을 보여줍니다.
+        return {
+            "status": "error",
+            "message": str(e)
+        }
+
 
 def process_full_workflow(request: GeoAnalysisRequest):
+    print(f"--- 분석 시작: {request.keyword} ---") # 로그에 찍히게 추가
     try:
         is_cited, report_text = perform_geo_analysis(request.keyword, request.brand_name, request.target_url)
+        print("--- Gemini 분석 완료, 메일 발송 시도 중... ---") # 로그에 찍히게 추가
         send_email_report(request.user_email, request.keyword, request.brand_name, is_cited, report_text)
+        print("--- 모든 과정 성공! 메일이 발송되었습니다. ---") # 로그에 찍히게 추가
     except Exception as e:
-        print(f"전체 흐름 실행 중 오류 발생: {e}")
+        print(f"!!! 치명적 오류 발생 !!!: {str(e)}") # 에러를 로그에 강제로 찍음
