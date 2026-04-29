@@ -14,8 +14,7 @@ app = FastAPI(title="DecideByAI GEO Engine V1")
 # EMAIL_PASSWORD: 구글 계정에서 발급받은 16자리 '앱 비밀번호'
 GEMINI_API_KEY = "AIzaSyA3GaoL-k8NrPlhTj3mclcYIpi-hNcT1DE"
 EMAIL_ADDRESS = "dreamjkdj@gmail.com"
-EMAIL_PASSWORD = "gfag vlbx ppsi evpi" 
-
+EMAIL_PASSWORD = "qmp zmht cahg nqki"
 genai.configure(api_key=GEMINI_API_KEY)
 
 # --- 2. 입력 양식 정의 (사용자가 웹에서 입력할 항목) ---
